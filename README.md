@@ -246,7 +246,7 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
    mvn spring-boot:run
    ```
    The API is served at `http://localhost:8080/api/v1.0`.
-6. Set up and run the frontend from its [repository](YOUR_FRONTEND_REPO_LINK).
+6. Set up and run the frontend from its [repository](https://github.com/Soumadeep1221/MoneyManager-Frontend.git).
 
 **Deployment notes**
 - Set the same environment variables on your host, with `FRONTEND_URL` pointing at the deployed frontend so activation links are correct.
