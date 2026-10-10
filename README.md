@@ -263,4 +263,3 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
 - `ddl-auto=update` is used instead of versioned migrations.
 - Replacing a profile picture leaves the previous image in Cloudinary, because the backend stores only the URL.
 - The email-report endpoints are `GET` requests that trigger a side effect, and they are not rate limited.
-- CORS should be restricted to the real frontend origin instead of a wildcard before any real deployment.
