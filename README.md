@@ -28,17 +28,17 @@ Short video walkthroughs of the three flows that matter most.
 ### 1. Full Architecture
 How the React frontend, Spring Boot API, PostgreSQL, Brevo SMTP, Google Identity, and Cloudinary fit together, and what travels along each connection.
 
-▶ [Watch the architecture walkthrough](YOUR_ARCHITECTURE_VIDEO_LINK)
+https://github.com/user-attachments/assets/bdec4f1d-d329-400c-b12b-d4336d4ba024
 
 ### 2. Email/Password Login with JWT
 Registration with an emailed activation link, then login: Spring Security's `AuthenticationManager` checks the BCrypt-hashed password, the backend issues a signed JWT, and `JwtRequestFilter` validates it on every later request.
 
-▶ [Watch the login and JWT walkthrough](YOUR_LOGIN_VIDEO_LINK)
+https://github.com/user-attachments/assets/0056b983-0348-4932-b9af-0cd35e7426ca
 
 ### 3. Google Authentication
 The frontend gets a Google ID token, the backend verifies it, finds or creates the profile, and issues the same JWT as a password login, so everything after sign-in works identically.
 
-▶ [Watch the Google authentication walkthrough](YOUR_GOOGLE_VIDEO_LINK)
+https://github.com/user-attachments/assets/d99a3097-7a39-43f4-b1a4-ccf7099caefb
 
 ---
 
