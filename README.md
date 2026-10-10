@@ -17,7 +17,7 @@ REST API for a personal finance tracker. Users register (or sign in with Google)
 
 Built with Spring Boot, PostgreSQL, and stateless JWT authentication.
 
-**Frontend repository:** [MoneyManager Frontend](YOUR_FRONTEND_REPO_LINK) (React + Tailwind CSS)
+**Frontend repository:** [MoneyManager Frontend](https://github.com/Soumadeep1221/MoneyManager-Frontend.git) (React + Tailwind CSS)
 
 ---
 
@@ -103,7 +103,7 @@ src/main/java/com/soumadeep/MoneyManager/
 
 ## API Reference
 
-Base path: `/api/v1.0`. Authenticated endpoints expect `Authorization: Bearer <token>` (HS256, 15-minute expiry).
+Base path: `/api/v1.0`. Authenticated endpoints expect `Authorization: Bearer <token>` (HS256, 30-minute expiry).
 
 ### Public
 
@@ -257,7 +257,7 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
 
 ## Known Limitations
 
-- Access tokens cannot be revoked or refreshed; a token stays valid until its 15-minute expiry.
+- Access tokens cannot be revoked or refreshed; a token stays valid until its 30-minute expiry.
 - No rate limiting or lockout on `/login`.
 - No bean validation on request DTOs and no global exception handler, so most service errors surface as generic server errors.
 - `ddl-auto=update` is used instead of versioned migrations.
