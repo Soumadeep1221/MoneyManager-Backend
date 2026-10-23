@@ -26,7 +26,7 @@ Built with Spring Boot, PostgreSQL, and stateless JWT authentication.
 
 ## Live Demo
 
-- **Live app:** [https://moneymanager-soumadeep1221.netlify.app/](https://moneymanager-soumadeep1221.netlify.app/)
+- **Live app:** [https://moneymanager-soumadeep1221.netlify.app](https://moneymanager-soumadeep1221.netlify.app)
 - **API base URL:** `https://moneymanager-1-0-mwxa.onrender.com/api/v1.0` (all endpoints except the public ones need a JWT)
 
 > **Please be patient on the first request.** The backend runs on Render's free plan and the database on Neon's free plan. After a period of inactivity, Render spins the backend down (after about 15 minutes) and Neon scales the database to zero. The first request then has to wake both up, which takes about **2 minutes 10 seconds on average and up to about 2.5 minutes** in my tests. Nothing is broken and it will not crash. Once everything is awake, the API responds normally.
