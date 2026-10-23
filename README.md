@@ -7,17 +7,31 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Google OAuth2](https://img.shields.io/badge/Google_OAuth2-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![Brevo SMTP](https://img.shields.io/badge/Brevo_SMTP-0B996E?style=for-the-badge&logo=brevo&logoColor=white)
+![Brevo Email API](https://img.shields.io/badge/Brevo_Email_API-0B996E?style=for-the-badge&logo=brevo&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 ![Apache POI](https://img.shields.io/badge/Apache_POI-D22128?style=for-the-badge&logo=apache&logoColor=white)
 ![Lombok](https://img.shields.io/badge/Lombok-BC4521?style=for-the-badge)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)
+![Neon](https://img.shields.io/badge/Neon-00E599?style=for-the-badge&logo=neon&logoColor=black)
 
 REST API for a personal finance tracker. Users register (or sign in with Google), organise their money into categories, record incomes and expenses, and get a dashboard summary, filtered transaction history, Excel exports, and daily email reminders.
 
 Built with Spring Boot, PostgreSQL, and stateless JWT authentication.
 
-**Frontend repository:** [MoneyManager Frontend](https://github.com/Soumadeep1221/MoneyManager-Frontend.git) (React + Tailwind CSS)
+**Frontend repository:** [MoneyManager Frontend](https://github.com/Soumadeep1221/MoneyManager-Frontend.git) (Next.js + Tailwind CSS)
+
+---
+
+## Live Demo
+
+- **Live app:** [https://moneymanager-soumadeep1221.netlify.app/](https://moneymanager-soumadeep1221.netlify.app/)
+- **API base URL:** `https://moneymanager-1-0-mwxa.onrender.com/api/v1.0` (all endpoints except the public ones need a JWT)
+
+> **Please be patient on the first request.** The backend runs on Render's free plan and the database on Neon's free plan. After a period of inactivity, Render spins the backend down (after about 15 minutes) and Neon scales the database to zero. The first request then has to wake both up, which takes about **2 minutes 10 seconds on average and up to about 2.5 minutes** in my tests. Nothing is broken and it will not crash. Once everything is awake, the API responds normally.
+
+If you find an error, a bug, or any loophole while exploring the app, please let me know.
 
 ---
 
@@ -26,7 +40,9 @@ Built with Spring Boot, PostgreSQL, and stateless JWT authentication.
 Short video walkthroughs of the three flows that matter most.
 
 ### 1. Full Architecture
-How the React frontend, Spring Boot API, PostgreSQL, Brevo SMTP, Google Identity, and Cloudinary fit together, and what travels along each connection.
+How the React frontend, Spring Boot API, PostgreSQL, Brevo email, Google Identity, and Cloudinary fit together, and what travels along each connection.
+
+*The video shows email delivery over SMTP. The deployed version sends email through Brevo's HTTP API instead, because Render's free tier blocks outbound SMTP ports (see [Deployment](#deployment)).*
 
 https://github.com/user-attachments/assets/bdec4f1d-d329-400c-b12b-d4336d4ba024
 
@@ -85,6 +101,7 @@ src/main/java/com/soumadeep/MoneyManager/
 - **The current user always comes from the token.** Services call `getCurrentProfile()`, which reads the authenticated email from `SecurityContextHolder`. No endpoint accepts a user or profile ID from the client.
 - **Ownership checks on every ID-based operation**, so changing an ID in a URL or body cannot reach another user's data.
 - **Stateless security**: no server-side sessions, CSRF disabled (no cookie auth), and a custom `JwtRequestFilter` runs before Spring's username/password filter.
+- **Email through an HTTP API**: `EmailService` calls Brevo's transactional email API over HTTPS (port 443) using Spring's `RestClient`, with connect and read timeouts, instead of sending through SMTP. Attachments such as the Excel reports are sent base64-encoded.
 
 ---
 
@@ -165,6 +182,8 @@ Both run in IST and are enabled with `@EnableScheduling`.
 | 22:00 | Reminder email to every registered user to log the day's income and expenses |
 | 23:00 | Summary email of the day's expenses, sent only to users who logged at least one |
 
+These jobs run inside the application, so they only fire while the backend is awake (see [Known Limitations](#known-limitations)).
+
 ---
 
 ## Configuration
@@ -184,14 +203,7 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
-#Email Configuration
-spring.mail.host=smtp-relay.brevo.com
-spring.mail.port=587
-spring.mail.username=${BREVO_USERNAME}
-spring.mail.password=${BREVO_PASSWORD}
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-spring.mail.protocol=smtp
+#Email Configuration (sender address; emails are sent through Brevo's HTTP API)
 spring.mail.properties.mail.smtp.from=${BREVO_FROM_EMAIL}
 
 #Secret Key
@@ -206,10 +218,10 @@ google.client.id=${GOOGLE_CLIENT_ID}
 
 | Environment variable | Purpose |
 |---|---|
-| `DATASOURCE_URL` | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/Money-Manager` |
+| `DATASOURCE_URL` | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/Money-Manager` locally, or `jdbc:postgresql://<neon-host>/neondb?sslmode=require` for Neon |
 | `DATASOURCE_USER`, `DATASOURCE_PASSWORD` | PostgreSQL credentials |
 | `SECRET_KEY` | Base64-encoded JWT signing secret, at least 256 bits |
-| `BREVO_USERNAME`, `BREVO_PASSWORD` | Brevo SMTP credentials |
+| `BREVO_API_KEY` | Brevo API key (created under SMTP & API → API Keys, with the Transactional email permission). Read directly by `EmailService` |
 | `BREVO_FROM_EMAIL` | Verified sender address |
 | `FRONTEND_URL` | Frontend base URL, used in emailed activation links |
 | `GOOGLE_CLIENT_ID` | OAuth Web client ID from Google Cloud Console |
@@ -220,7 +232,7 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
 
 ## Getting Started
 
-**Prerequisites:** JDK 25, Maven, PostgreSQL.
+**Prerequisites:** JDK 25, Maven, PostgreSQL (or a Neon database), and a Brevo account.
 
 1. Create the database (the quotes are needed because of the hyphen):
    ```sql
@@ -240,18 +252,68 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
    ```powershell
    Get-Content .env | ForEach-Object { if ($_ -match '^\s*([^#=]+)=(.*)$') { [Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim(), 'Process') } }
    ```
-4. In Google Cloud Console, create a Web OAuth client and add the frontend origin (for example `http://localhost:3000`) under Authorized JavaScript origins.
-5. Run the backend:
+4. In Brevo, verify your sender address (Senders, domains, IPs) and create an API key with the Transactional email permission. Put it in `.env` as `BREVO_API_KEY`.
+5. In Google Cloud Console, create a Web OAuth client and add the frontend origin (for example `http://localhost:3000`) under Authorized JavaScript origins.
+6. Run the backend:
    ```bash
    mvn spring-boot:run
    ```
    The API is served at `http://localhost:8080/api/v1.0`.
-6. Set up and run the frontend from its [repository](https://github.com/Soumadeep1221/MoneyManager-Frontend.git).
+7. Set up and run the frontend from its [repository](https://github.com/Soumadeep1221/MoneyManager-Frontend.git).
 
 **Deployment notes**
 - Set the same environment variables on your host, with `FRONTEND_URL` pointing at the deployed frontend so activation links are correct.
 - Add the deployed frontend origin to the Google OAuth client's authorized origins.
 - Set the server timezone to `Asia/Kolkata` (for example `TZ=Asia/Kolkata`). `LocalDate.now()` and the timestamp annotations use the JVM's default zone, which is often UTC on cloud hosts and shifts dates by a day for about 5.5 hours each night.
+
+---
+
+## Docker
+
+The backend is packaged as a Docker image using a small Dockerfile in the project root:
+
+```dockerfile
+FROM eclipse-temurin:25-jre
+COPY target/app.jar app.jar
+CMD ["java", "-jar", "app.jar"]
+```
+
+Use your own jar name in the `COPY` and `CMD` lines (it comes from `finalName` in `pom.xml`, or defaults to `artifactId-version.jar`).
+
+```bash
+# 1. Build the jar
+mvn clean package -DskipTests
+
+# 2. Build the image
+docker build -t <dockerhub-username>/moneymanager:1.0 .
+
+# 3. Run it locally with your environment variables
+docker run -p 8080:8080 --env-file .env <dockerhub-username>/moneymanager:1.0
+```
+
+`--env-file` passes the values from `.env` into the container. The `.env` file itself is never copied into the image. In `.env`, write plain `KEY=value` lines without quotes.
+
+---
+
+## Deployment
+
+The full application runs on free tiers:
+
+| Part | Platform | Details |
+|---|---|---|
+| Database | Neon | Serverless PostgreSQL, Singapore region |
+| Backend | Render (Web Service, Free plan) | Docker image pulled from Docker Hub |
+| Frontend | Netlify | Next.js app, see the [frontend repository](https://github.com/Soumadeep1221/MoneyManager-Frontend.git) |
+
+**Steps**
+
+1. **Database:** create a Neon project and copy the host, database, user, and password into `DATASOURCE_URL`, `DATASOURCE_USER`, and `DATASOURCE_PASSWORD`. The JDBC URL needs `?sslmode=require`.
+2. **Image:** build the jar, build the Docker image, test it locally against the Neon database, then `docker login` and `docker push` it to a public Docker Hub repository. Use a new tag for every change so Render pulls the updated image.
+3. **Render:** create a Web Service from the **Existing Image** (`docker.io/<dockerhub-username>/moneymanager:<tag>`), choose the Singapore region and the Free instance type, add every environment variable from the table above, and deploy. Render detects port 8080 on its own, and changing a variable later triggers an automatic redeploy.
+4. **Frontend:** deploy it on Netlify with `NEXT_PUBLIC_API_BASE_URL` set to `https://<render-service>.onrender.com/api/v1.0`.
+5. **Connect both sides:** set `FRONTEND_URL` on Render to the Netlify URL (no trailing slash), allow that origin in the CORS configuration, and add it to the Google OAuth client's authorized JavaScript origins.
+
+**Why email uses an HTTP API:** Render's free web services block outbound traffic on SMTP ports 25, 465, and 587, so an SMTP connection to Brevo times out in the cloud even though it works on a local machine. `EmailService` therefore sends through Brevo's transactional email API over HTTPS instead.
 
 ---
 
@@ -263,3 +325,4 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
 - `ddl-auto=update` is used instead of versioned migrations.
 - Replacing a profile picture leaves the previous image in Cloudinary, because the backend stores only the URL.
 - The email-report endpoints are `GET` requests that trigger a side effect, and they are not rate limited.
+- On the free hosting plans, the backend sleeps when idle and the first request takes about 2 to 2.5 minutes. The scheduled reminder and summary emails run inside the application, so they only fire while the backend is awake.
