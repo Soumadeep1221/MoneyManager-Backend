@@ -107,6 +107,7 @@
     </dependencies>
 
     <build>
+        <finalName>Money-Manager</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
