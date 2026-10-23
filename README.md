@@ -17,7 +17,7 @@ REST API for a personal finance tracker. Users register (or sign in with Google)
 
 Built with Spring Boot, PostgreSQL, and stateless JWT authentication.
 
-**Frontend repository:** [MoneyManager Frontend](YOUR_FRONTEND_REPO_LINK) (React + Tailwind CSS)
+**Frontend repository:** [MoneyManager Frontend](https://github.com/Soumadeep1221/MoneyManager-Frontend.git) (React + Tailwind CSS)
 
 ---
 
@@ -28,17 +28,17 @@ Short video walkthroughs of the three flows that matter most.
 ### 1. Full Architecture
 How the React frontend, Spring Boot API, PostgreSQL, Brevo SMTP, Google Identity, and Cloudinary fit together, and what travels along each connection.
 
-▶ [Watch the architecture walkthrough](YOUR_ARCHITECTURE_VIDEO_LINK)
+https://github.com/user-attachments/assets/bdec4f1d-d329-400c-b12b-d4336d4ba024
 
 ### 2. Email/Password Login with JWT
 Registration with an emailed activation link, then login: Spring Security's `AuthenticationManager` checks the BCrypt-hashed password, the backend issues a signed JWT, and `JwtRequestFilter` validates it on every later request.
 
-▶ [Watch the login and JWT walkthrough](YOUR_LOGIN_VIDEO_LINK)
+https://github.com/user-attachments/assets/0056b983-0348-4932-b9af-0cd35e7426ca
 
 ### 3. Google Authentication
 The frontend gets a Google ID token, the backend verifies it, finds or creates the profile, and issues the same JWT as a password login, so everything after sign-in works identically.
 
-▶ [Watch the Google authentication walkthrough](YOUR_GOOGLE_VIDEO_LINK)
+https://github.com/user-attachments/assets/d99a3097-7a39-43f4-b1a4-ccf7099caefb
 
 ---
 
@@ -103,7 +103,7 @@ src/main/java/com/soumadeep/MoneyManager/
 
 ## API Reference
 
-Base path: `/api/v1.0`. Authenticated endpoints expect `Authorization: Bearer <token>` (HS256, 15-minute expiry).
+Base path: `/api/v1.0`. Authenticated endpoints expect `Authorization: Bearer <token>` (HS256, 30-minute expiry).
 
 ### Public
 
@@ -246,7 +246,7 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
    mvn spring-boot:run
    ```
    The API is served at `http://localhost:8080/api/v1.0`.
-6. Set up and run the frontend from its [repository](YOUR_FRONTEND_REPO_LINK).
+6. Set up and run the frontend from its [repository](https://github.com/Soumadeep1221/MoneyManager-Frontend.git).
 
 **Deployment notes**
 - Set the same environment variables on your host, with `FRONTEND_URL` pointing at the deployed frontend so activation links are correct.
@@ -257,16 +257,9 @@ A ready-to-copy template is in [`.env.example`](.env.example). Generate a JWT se
 
 ## Known Limitations
 
-- Access tokens cannot be revoked or refreshed; a token stays valid until its 15-minute expiry.
+- Access tokens cannot be revoked or refreshed; a token stays valid until its 30-minute expiry.
 - No rate limiting or lockout on `/login`.
 - No bean validation on request DTOs and no global exception handler, so most service errors surface as generic server errors.
 - `ddl-auto=update` is used instead of versioned migrations.
 - Replacing a profile picture leaves the previous image in Cloudinary, because the backend stores only the URL.
 - The email-report endpoints are `GET` requests that trigger a side effect, and they are not rate limited.
-- CORS should be restricted to the real frontend origin instead of a wildcard before any real deployment.
-
----
-
-## Author
-
-Soumadeep
